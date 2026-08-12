@@ -1,0 +1,76 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mosaic-postgres
+    environment:
+      POSTGRES_USER: mosaic
+      POSTGRES_PASSWORD: mosaic_dev_pw
+      POSTGRES_DB: mosaic
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mosaic-net
+
+  mongo:
+    image: mongo:7
+    container_name: mosaic-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mosaic-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: mosaic-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mosaic-net
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: mosaic-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - mosaic-net
+
+  ai-engine:
+    build: ./ai-engine
+    container_name: mosaic-ai-engine
+    env_file: ./ai-engine/.env
+    depends_on:
+      - chromadb
+    ports:
+      - "8001:8001"
+    networks:
+      - mosaic-net
+
+  node-api:
+    build: ./server
+    container_name: mosaic-node-api
+    env_file: ./server/.env
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+      - ai-engine
+    ports:
+      - "5050:5000"
+    networks:
+      - mosaic-net
+
+networks:
+  mosaic-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo_data:
+  chroma_data:

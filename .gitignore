@@ -1,0 +1,12 @@
+node_modules/
+__pycache__/
+*.pyc
+.env
+dist/
+build/
+postgres_data/
+mongo_data/
+chroma_data/
+.DS_Store
+.venv/
+venv/
