@@ -69,3 +69,12 @@ export async function me(req, res) {
 
   res.status(200).json({ user });
 }
+export async function recruiterOnlyPing(req, res) {
+  res.status(200).json({ message: `Hello recruiter ${req.user.id}, you have access.` });
+}
+
+// 1234567
+//left rotate by 2
+// so swap 12 and 76
+// 2176543
+//swap all : 3456712
