@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { create, list, getOne } from "../controllers/job.controller.js";
+import { create } from "../controllers/company.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { requireRole } from "../middlewares/role.middleware.js";
 
 const router = Router();
 
-router.get("/", list);
-router.get("/:id", getOne);
 router.post("/", authenticate, requireRole("RECRUITER"), create);
 
 export default router;

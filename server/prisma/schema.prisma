@@ -14,6 +14,7 @@ model User {
   role          Role           @default(CANDIDATE)
   createdAt     DateTime       @default(now())
   refreshTokens RefreshToken[]
+  companies     Company[]
 }
 
 model RefreshToken {
@@ -24,6 +25,36 @@ model RefreshToken {
   expiresAt DateTime
   revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model Company {
+  id          String       @id @default(uuid())
+  name        String
+  industry    String?
+  size        String?
+  ownerId     String
+  owner       User         @relation(fields: [ownerId], references: [id])
+  jobPostings JobPosting[]
+  createdAt   DateTime     @default(now())
+}
+
+model JobPosting {
+  id             String    @id @default(uuid())
+  companyId      String
+  company        Company   @relation(fields: [companyId], references: [id])
+  title          String
+  description    String
+  location       String
+  salaryMin      Int?
+  salaryMax      Int?
+  employmentType String
+  status         JobStatus @default(OPEN)
+  createdAt      DateTime  @default(now())
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
 }
 
 enum Role {
