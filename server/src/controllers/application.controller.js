@@ -5,6 +5,7 @@ import {
   findApplicantsByJob,
   findApplicationById,
   updateApplicationStatus,
+  findExistingApplication,
 } from "../services/application.service.js";
 import { findJobPostingById } from "../services/job.service.js";
 
@@ -16,9 +17,7 @@ export async function apply(req, res) {
     return res.status(404).json({ error: "Job not found" });
   }
 
-  const existing = await prisma.application.findUnique({
-    where: { jobId_candidateId: { jobId, candidateId: req.user.id } },
-  });
+  const existing = await findExistingApplication(jobId, req.user.id);
   if (existing) {
     return res.status(409).json({ error: "You have already applied to this job" });
   }
