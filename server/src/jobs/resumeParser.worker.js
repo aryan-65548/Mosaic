@@ -18,10 +18,25 @@ const worker = new Worker(
   async (job) => {
     const { resumeId, fileBuffer } = job.data;
 
-    await Resume.findByIdAndUpdate(resumeId, { status: "PROCESSING" });
+    if (typeof resumeId !== "string" || typeof fileBuffer !== "string" || !fileBuffer) {
+      throw new Error("Resume job is missing a valid resumeId or fileBuffer");
+    }
+
+    const resume = await Resume.findByIdAndUpdate(
+      resumeId,
+      { status: "PROCESSING" },
+      { new: true }
+    );
+    if (!resume) {
+      throw new Error(`Resume ${resumeId} was not found`);
+    }
 
     try {
       const buffer = Buffer.from(fileBuffer, "base64");
+      if (buffer.length === 0) {
+        throw new Error("Resume job contains an empty PDF file");
+      }
+
       const parser = new PDFParse({ data: buffer });
       let text;
 
@@ -39,7 +54,10 @@ const worker = new Worker(
 
       console.log(`Resume ${resumeId} processed successfully`);
     } catch (err) {
-      await Resume.findByIdAndUpdate(resumeId, { status: "FAILED" });
+      const maxAttempts = job.opts.attempts ?? 1;
+      if (job.attemptsMade + 1 >= maxAttempts) {
+        await Resume.findByIdAndUpdate(resumeId, { status: "FAILED" });
+      }
       console.error(`Resume ${resumeId} processing failed:`, err.message);
       throw err;
     }

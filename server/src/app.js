@@ -5,6 +5,7 @@ import companiesRoutes from "./routes/companies.routes.js";
 import jobsRoutes from "./routes/jobs.routes.js";
 import applicationsRoutes from "./routes/applications.routes.js";
 import resumesRoutes from "./routes/resumes.routes.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.use("/api/companies", companiesRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/applications", applicationsRoutes);
 app.use("/api/resumes", resumesRoutes);
+app.use(errorHandler);
 
 export default app;
