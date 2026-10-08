@@ -1,5 +1,10 @@
 import { createJobSchema } from "../schemas/job.schema.js";
-import { createJobPosting, listJobPostings, findJobPostingById } from "../services/job.service.js";
+import {
+  createJobPosting,
+  listJobPostings,
+  listJobPostingsByOwner,
+  findJobPostingById,
+} from "../services/job.service.js";
 import { findCompanyById } from "../services/company.service.js";
 
 export async function create(req, res) {
@@ -23,6 +28,11 @@ export async function create(req, res) {
 
 export async function list(req, res) {
   const jobs = await listJobPostings();
+  res.status(200).json({ jobs });
+}
+
+export async function mine(req, res) {
+  const jobs = await listJobPostingsByOwner(req.user.id);
   res.status(200).json({ jobs });
 }
 

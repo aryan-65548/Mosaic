@@ -12,6 +12,14 @@ export async function listJobPostings() {
   });
 }
 
+export async function listJobPostingsByOwner(ownerId) {
+  return prisma.jobPosting.findMany({
+    where: { company: { is: { ownerId } } },
+    orderBy: { createdAt: "desc" },
+    include: { company: { select: { name: true, industry: true } } },
+  });
+}
+
 export async function findJobPostingById(id) {
   return prisma.jobPosting.findUnique({
     where: { id },

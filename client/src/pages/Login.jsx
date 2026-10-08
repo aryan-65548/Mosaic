@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginUser } from "../services/auth.api.js";
 import useAuthStore from "../store/authStore.js";
 
@@ -8,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const login = useAuthStore((state) => state.login);
 
   async function handleSubmit(e) {
@@ -17,7 +18,7 @@ export default function Login() {
     try {
       const data = await loginUser(email, password);
       login(data.user, data.accessToken, data.refreshToken);
-      navigate("/");
+      navigate(location.state?.from || "/");
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong");
     }
@@ -45,7 +46,7 @@ export default function Login() {
         <button type="submit">Log In</button>
       </form>
       <p className="link">
-        Don't have an account? <Link to="/signup">Sign up</Link>
+        Don't have an account? <Link to="/signup" state={location.state}>Sign up</Link>
       </p>
     </div>
   );

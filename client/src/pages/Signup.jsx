@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { registerUser } from "../services/auth.api.js";
 import useAuthStore from "../store/authStore.js";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("CANDIDATE");
+  const [role, setRole] = useState(location.state?.defaultRole || "CANDIDATE");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
 
   async function handleSubmit(e) {
@@ -18,7 +19,7 @@ export default function Signup() {
     try {
       const data = await registerUser(email, password, role);
       login(data.user, data.accessToken, data.refreshToken);
-      navigate("/");
+      navigate(location.state?.from || "/");
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong");
     }
@@ -50,7 +51,7 @@ export default function Signup() {
         <button type="submit">Sign Up</button>
       </form>
       <p className="link">
-        Already have an account? <Link to="/login">Log in</Link>
+        Already have an account? <Link to="/login" state={location.state}>Log in</Link>
       </p>
     </div>
   );

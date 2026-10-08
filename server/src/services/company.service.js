@@ -9,3 +9,10 @@ export async function createCompany(ownerId, data) {
 export async function findCompanyById(id) {
   return prisma.company.findUnique({ where: { id } });
 }
+
+export async function findCompaniesByOwner(ownerId) {
+  return prisma.company.findMany({
+    where: { ownerId },
+    orderBy: { createdAt: "desc" },
+  });
+}
