@@ -16,6 +16,9 @@ export async function apply(req, res) {
   if (!job) {
     return res.status(404).json({ error: "Job not found" });
   }
+  if (job.status !== "OPEN") {
+    return res.status(409).json({ error: "This job is no longer accepting applications" });
+  }
 
   const existing = await findExistingApplication(jobId, req.user.id);
   if (existing) {
