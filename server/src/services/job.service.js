@@ -18,3 +18,10 @@ export async function findJobPostingById(id) {
     include: { company: { select: { name: true, industry: true } } },
   });
 }
+
+export async function findJobCompanyOwner(jobId) {
+  return prisma.jobPosting.findUnique({
+    where: { id: jobId },
+    select: { company: { select: { ownerId: true } } },
+  });
+}

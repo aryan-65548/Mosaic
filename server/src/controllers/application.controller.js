@@ -7,7 +7,7 @@ import {
   updateApplicationStatus,
   findExistingApplication,
 } from "../services/application.service.js";
-import { findJobPostingById } from "../services/job.service.js";
+import { findJobPostingById, findJobCompanyOwner } from "../services/job.service.js";
 
 export async function apply(req, res) {
   const jobId = req.params.id;
@@ -41,7 +41,8 @@ export async function applicantsForJob(req, res) {
   if (!job) {
     return res.status(404).json({ error: "Job not found" });
   }
-  if (job.company.ownerId !== req.user.id) {
+  const jobOwner = await findJobCompanyOwner(jobId);
+  if (!jobOwner || jobOwner.company.ownerId !== req.user.id) {
     return res.status(403).json({ error: "You do not own this job's company" });
   }
 
